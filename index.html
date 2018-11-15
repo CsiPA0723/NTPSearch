@@ -3,10 +3,32 @@
     <head>
         <meta charset="utf-8" />
         <title>NTP Search</title>
-        <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
+        <link rel="stylesheet" type="text/css" media="screen" href="style.css" />
         <script src="./Scripts/script.js"></script>
     </head>
     <body>
-        
+        <p>
+            <input id="game-search" type="text" />
+            <button id="button-game-search">Search</button>
+        </p>
+
+        <p>
+            <input id="user-search" type="text" />
+            <select>
+                <option value="own">Own</option>
+                <option value="rated">Rated</option>
+                <option value="played">Played</option>
+                <option value="comment">Comment</option>
+                <option value="trade">Trade</option>
+                <option value="want">Want</option>
+                <option value="wantintrade">Want-in-trade</option>
+                <option value="whislist">Whislist</option>
+            </select>
+            <select>
+                <option value="0">0</option>
+                <option value="1">1</option>
+            </select>
+            <button id="button-user-search">Search</button>
+        </p>
     </body>
 </html>
