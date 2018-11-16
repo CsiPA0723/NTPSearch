@@ -38,4 +38,16 @@ function userSearch() {
     var uSelect2 = document.getElementById("user-select2").value;
     var result = document.getElementById("result");
 
+    var xhttp = new XMLHttpRequest();
+
+    xhttp.onreadystatechange = function() {
+        if(this.readyState == 4 && this.status == 200) {
+            result.innerHTML = this.responseText;
+        }
+    }
+
+    if(uSelect) xhttp.open("GET", `${url}collection/${encodeURIComponent(uSearch)}?${encodeURIComponent(uSelect)}=${encodeURIComponent(uSelect2)}`, true);
+    else xhttp.open("GET", `${url}collection/${encodeURIComponent(uSearch)}`, true);
+    xhttp.setRequestHeader('Term', 'Accept');
+    xhttp.send();
 }
