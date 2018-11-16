@@ -4,43 +4,28 @@
 
 body {
     text-align: center;
-    background-image: url("backg.jpg");
+    background-color: snow;
     background-repeat: no-repeat;
-    background-size: 100%; 
+    background-size: 150%; 
 }
 
 p {
     font-size: 100%;
 }
 
-.style2 {
-    text-align: right;
-    border-width: 1px;
+button{
+    font-size:100%;
+    border-color: gray;
+    color: white;
+    background-color:black;
+    border-radius: 15px;
 }
 
-.style4 {
-    text-align: center;
-}
-
-.style5 {
-    border-style: solid;
-    border-width: 1px;
-    background-color: #C0C0C0;
-}
-
-.style6 {
-    border-width: 1px;
-}
-
-.style7 {
-    text-align: center;
-    border-width: 1px;
-}
-
-.style8 {
-    background-color: #C0C0C0;
-}
-
-.style9 {
-    font-size: medium;
+h1{
+    color: gray;
+    text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000; 
 }
