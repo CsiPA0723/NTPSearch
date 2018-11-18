@@ -5,52 +5,55 @@ var boardGames = new Map();
 function onDrop(id) {
     var boardGame = boardGames.get(id);
     console.log(boardGame);
-    var row = document.getElementById(id);
+    var infoBox = document.getElementById("selected-game");
+
     var xhttp = new XMLHttpRequest();
 
     xhttp.onreadystatechange = function() {
         if(this.readyState == 4 && this.status == 200) {
-            var parser = new DOMParser();
-            var xmlDoc = parser.parseFromString(this.responseText, "text/xml");
-            var gameInfo = xmlDoc.getElementsByTagName("boardgame");
-            if(gameInfo) {
-                var tbl = document.createElement('table');
-                tbl.id = "table";
-                var tbdy = document.createElement('tbody');
-                for(let i = 0; i < gameInfo.length; i++) {
-                    var id = gameInfo[i].getAttribute("objectid");
-                    var name = gameInfo[i].getElementsByTagName("name")[0].childNodes[0].nodeValue;
-                    var year = "undefined";
-                    if(gameInfo[i].getElementsByTagName("yearpublished")[0]) {
-                        year = gameInfo[i].getElementsByTagName("yearpublished")[0].childNodes[0].nodeValue;
-                    }
-    
-                    var tr = document.createElement('tr');
-                    tr.id = i;
-                    tr.onclick = function() {onDrop(this.id)};
-                    for(let j = 0; j < 2; j++) {
-                        var td = document.createElement('td');
-                        td.innerHTML = j == 0 ? name : year;
-                        tr.appendChild(td);
-                    }
-                    var boardGame = createBoardGameObject(id, name, year);
-                    boardGames.set(id, boardGame);
-                    tbdy.appendChild(tr);
-                }
-                tbl.appendChild(tbdy);
-                row.appendChild(tbl) 
+            var selectedBoardGame = findIn(boardGames, "selected", true, true);
+            console.log(selectedBoardGame);
+            if(selectedBoardGame) {
+                selectedBoardGame.selected = false;
+                var selectedRow = document.getElementById(`${selectedBoardGame.id}`);
+                selectedRow.style.backgroundColor = "transparent";
             }
-            var msg = xmlDoc.getElementsByTagName("message");
-            if(msg[0]) {
-                result.innerHTML = msg[0].childNodes[0].nodeValue;
-            }
+            boardGame.selected = true;
+            var row = document.getElementById(`${boardGame.id}`);
+            row.style.backgroundColor = "lightblue";
+
+            infoBox.innerHTML = this.responseText;
+
+            /** 
+             * name
+             * yearpublished 
+             * minplayers | maxplayers
+             * minplaytime | maxplaytime
+             * age
+             * description
+             * image
+             * boardgamepublisher
+             * boardgamedesigner
+             * boardgameartist
+             * statistics => ratings
+             *      average
+             *      averageweight
+             *      owned
+            */
         }
     }
-    xhttp.open("GET", `${url}search?search=${encodeURIComponent(gSearch)}`, true)
+    xhttp.open("GET", `${url}boardgame/${id}?stats=1`, true)
     xhttp.send();
 }
 
+function lastSelected() {
+    var selectedBoardGame = findIn(boardGames, "selected", true, true);
+    if(!selectedBoardGame) return;
+    document.getElementById(`${selectedBoardGame.id}`).scrollIntoView();
+}
+
 function gameSearch() {
+    boardGames = new Map();
     var gSearch = document.getElementById("game-search").value;
     if(!gSearch) {
         document.getElementById("result").innerHTML = "Game search text is missing, please fill it in.";
@@ -69,6 +72,14 @@ function gameSearch() {
                 var tbl = document.createElement('table');
                 tbl.id = "table";
                 var tbdy = document.createElement('tbody');
+                var tr = document.createElement('tr');
+                var th = document.createElement('th');
+                th.innerHTML = "Name";
+                tr.appendChild(th);
+                th = document.createElement('th');
+                th.innerHTML = "Year";
+                tr.appendChild(th);
+                tbdy.append(tr);
                 for(let i = 0; i < gamelist.length; i++) {
                     var id = gamelist[i].getAttribute("objectid");
                     var name = gamelist[i].getElementsByTagName("name")[0].childNodes[0].nodeValue;
@@ -77,8 +88,8 @@ function gameSearch() {
                         year = gamelist[i].getElementsByTagName("yearpublished")[0].childNodes[0].nodeValue;
                     }
     
-                    var tr = document.createElement('tr');
-                    tr.id = i;
+                    tr = document.createElement('tr');
+                    tr.id = id;
                     tr.onclick = function() {onDrop(this.id)};
                     for(let j = 0; j < 2; j++) {
                         var td = document.createElement('td');
@@ -104,6 +115,7 @@ function gameSearch() {
 }
 
 function userSearch() {
+    boardGames = new Map();
     var uSearch = document.getElementById("user-search").value;
     var uSelect = document.getElementById("user-select").value;
     var uSelect2 = document.getElementById("user-select2").value;
@@ -130,50 +142,31 @@ function createBoardGameObject(id, name, year) {
     var obj = {
         id: id,
         name: name,
-        year: year
+        year: year,
+        selected: false
     }
     return obj;
 }
 
-/*function tableCreate() {
-    let whOrBl = false;
-    var body = document.getElementById("chessTable");
-    var tbl = document.createElement('table');
-    tbl.id = "table";
-    var tbdy = document.createElement('tbody');
-    for (let i = 0; i < HEIGTH; i++) {
-        var tr = document.createElement('tr');
-        for (let j = 0; j < WIDTH; j++) {
-            var td = document.createElement('td');
-            if(DEBUG) td.innerHTML = `${j} ${i}`;
-            if(DEBUG) td.style.color = "rgb(100, 200, 200)";
-            td.style.backgroundColor = `${whOrBl ? lightbrown: brown}`;
-            td.id = `td(${j}_${i})`;
-            td.style.backgroundSize = "100%";
-            td.style.backgroundRepeat = "no-repeat";
-            td.onclick = function() {onClick(this.id)};
-            if(i == 0 || i == HEIGTH - 1) {
-                if(i == 0){
-                    td.style.backgroundImage = `url("./BlackCMs/black_${figureOrder[j].name}.png")`;
-                } else {
-                    td.style.backgroundImage = `url("./WhiteCMs/white_${figureOrder[j].name}.png")`;
-                }
-                figures.set(td.id, createFigureObj(td.id, figureOrder[j].name, i == 0 ? "black" : "white", j, i, figureOrder[j].point, td.style.backgroundImage));
-            } else if (i == 1 || i == HEIGTH - 2) {
-                if(i == 1) {
-                    td.style.backgroundImage = `url("./BlackCMs/black_pawn.png")`;
-                } else {
-                    td.style.backgroundImage = `url("./WhiteCMs/white_pawn.png")`;
-                }
-                figures.set(td.id, createFigureObj(td.id, "pawn", i == 1 ? "black" : "white", j, i, 1, td.style.backgroundImage));
+function findIn(map, find, value, first) {
+    if(first) {
+        var key;
+        map.forEach((v, k) => {
+            if(v[`${find}`] == value) {
+                key = k;
+                return;
             }
-            tiles.set(td.id, createTileObj(td.id, figures.get(td.id) || null, td.style.backgroundColor));
-            tr.appendChild(td);
-            whOrBl = !whOrBl;
-        }
-        whOrBl = !whOrBl;
-        tbdy.appendChild(tr);
+        })
+        if(key) return map.get(key);
+        return false;
+    } else {
+        var keys = [];
+        map.forEach((v, k) => {
+            if(v[`${find}`] == value) {
+                keys.push(k);
+            }
+        })
+        if(keys.length > 0 || keys) return keys;
+        return false;
     }
-    tbl.appendChild(tbdy);
-    body.appendChild(tbl);
-}*/ 
+}
