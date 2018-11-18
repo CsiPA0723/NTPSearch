@@ -10,11 +10,11 @@
     <body>
         <h1>Search a board game!</h1>
         <p>
-            <input id="game-search" type="text" />
+            <input id="game-search" type="text" placeholder="Board Game Name" />
             <button id="button-game-search" onclick="gameSearch()">Search</button>
         </p>
         <p>
-            <input id="user-search" type="text" />
+            <input id="user-search" type="text" placeholder="User Name" />
             <select id="user-select">
                 <option value="null"></option>
                 <option value="own">Own</option>
@@ -33,9 +33,9 @@
             <button id="button-user-search" onclick="userSearch()">Search</button>
         </p>
         <p><button id="goto-last-button" onclick="lastSelected()">GoTo Selected Board Game</button></p>
-        <h3>Game Information</h3>
-        <p id="selected-game">|-|-|-|</p>
-        <h3>List</h3>
-        <p id="result">|-|-|-|</p>
+        <h3>Selected Board Game InfoBox</h3>
+        <p id="selected-game">Waiting...</p>
+        <h3>Found Board Games</h3>
+        <p id="result">Waiting...</p>
     </body>
 </html>

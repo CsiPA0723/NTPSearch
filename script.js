@@ -130,6 +130,10 @@ function userSearch() {
     xhttp.onreadystatechange = function() {
         if(this.readyState == 4 && this.status == 200) {
             result.innerHTML = this.responseText;
+            /**
+             * if respons is empty notify the user
+             * if respons is onnhold try again and do this in the board game search too
+             */
         }
     }
 
