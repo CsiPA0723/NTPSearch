@@ -158,7 +158,6 @@ function findIn(map, find, value, first) {
             }
         })
         if(key) return map.get(key);
-        return false;
     } else {
         var keys = [];
         map.forEach((v, k) => {
@@ -167,6 +166,6 @@ function findIn(map, find, value, first) {
             }
         })
         if(keys.length > 0 || keys) return keys;
-        return false;
     }
+    return false;
 }
