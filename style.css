@@ -93,6 +93,11 @@ img.boxImg {
     float: right;
 }
 
+.waitLabel {
+    text-align: center;
+    display: block;
+}
+
 .success {background-color: #4CAF50;} /* Green */
 .info {background-color: #2196F3;} /* Blue */
 .warning {background-color: #ff9800;} /* Orange */

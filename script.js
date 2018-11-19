@@ -125,7 +125,7 @@ function onDrop(id) {
             } else if(msg[0]) {
                 infoBox.innerHTML = msg[0].childNodes[0].nodeValue;
             } else {
-                infoBox.innerHTML = "<label style='display:block;text-align:center'>Something went wrong...</label>";
+                infoBox.innerHTML = "<label class='waitLabel'>Something went wrong...</label>";
             }
         }
 
