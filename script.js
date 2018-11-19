@@ -6,7 +6,8 @@ function onDrop(id) {
     var boardGame = boardGames.get(id);
     console.log(boardGame);
     var infoBox = document.getElementById("selected-game");
-
+    var row = document.getElementById(`${boardGame.id}`);
+    row.cells[0].innerHTML += `<span class="label info">Searching</span>`
     var xhttp = new XMLHttpRequest();
 
     xhttp.onreadystatechange = function() {
@@ -16,13 +17,14 @@ function onDrop(id) {
             if(selectedBoardGame) {
                 selectedBoardGame.selected = false;
                 var selectedRow = document.getElementById(`${selectedBoardGame.id}`);
-                selectedRow.style.backgroundColor = "transparent";
+                selectedRow.style.backgroundColor = "";
             }
             boardGame.selected = true;
-            var row = document.getElementById(`${boardGame.id}`);
+            row.cells[0].innerHTML = boardGame.name;
             row.style.backgroundColor = "lightblue";
 
             infoBox.innerHTML = this.responseText;
+            document.documentElement.scrollTop = 0;
 
             /** 
              * name
@@ -129,7 +131,49 @@ function userSearch() {
 
     xhttp.onreadystatechange = function() {
         if(this.readyState == 4 && this.status == 200) {
-            result.innerHTML = this.responseText;
+            var parser = new DOMParser();
+            var xmlDoc = parser.parseFromString(this.responseText, "text/xml");
+            var gamelist = xmlDoc.getElementsByTagName("item");
+            if(gamelist) {
+                var tbl = document.createElement('table');
+                tbl.id = "table";
+                var tbdy = document.createElement('tbody');
+                var tr = document.createElement('tr');
+                var th = document.createElement('th');
+                th.innerHTML = "Name";
+                tr.appendChild(th);
+                th = document.createElement('th');
+                th.innerHTML = "Year";
+                tr.appendChild(th);
+                tbdy.append(tr);
+                for(let i = 0; i < gamelist.length; i++) {
+                    var id = gamelist[i].getAttribute("objectid");
+                    var name = gamelist[i].getElementsByTagName("name")[0].childNodes[0].nodeValue;
+                    var year = "undefined";
+                    if(gamelist[i].getElementsByTagName("yearpublished")[0]) {
+                        year = gamelist[i].getElementsByTagName("yearpublished")[0].childNodes[0].nodeValue;
+                    }
+    
+                    tr = document.createElement('tr');
+                    tr.id = id;
+                    tr.onclick = function() {onDrop(this.id)};
+                    for(let j = 0; j < 2; j++) {
+                        var td = document.createElement('td');
+                        td.innerHTML = j == 0 ? name : year;
+                        tr.appendChild(td);
+                    }
+                    var boardGame = createBoardGameObject(id, name, year);
+                    boardGames.set(id, boardGame);
+                    tbdy.appendChild(tr);
+                }
+                tbl.appendChild(tbdy);
+                result.innerHTML = "";
+                result.appendChild(tbl);
+            }
+            var msg = xmlDoc.getElementsByTagName("message");
+            if(msg[0]) {
+                result.innerHTML = msg[0].childNodes[0].nodeValue;
+            }
             /**
              * if respons is empty notify the user
              * if respons is onnhold try again and do this in the board game search too
