@@ -58,10 +58,11 @@ img.boxImg {
     float: right;
     width: 25%;
     height: 25%;
+    margin-left: 20px;
+    margin-bottom: 20px;
 }
 
 .box {
-    display: block;
     overflow: auto;
     text-align: left;
     margin: auto 25%;
@@ -71,9 +72,17 @@ img.boxImg {
 }
 
 .descBox {
-    display: block;
-    margin: auto 30px;
-    border-left: 1px solid black;
+    display: flex;
+    margin: auto 10px;
+    border: 1px dotted black;
+    text-align: left;
+    padding: 10px;
+}
+
+.ratingBox {
+    display: flex;
+    float: right;
+    border: 1px dotted black;
     text-align: left;
     padding: 10px;
 }
