@@ -54,6 +54,30 @@ h1 {
     1px 1px 0 #000; 
 }
 
+img.boxImg {
+    float: right;
+    width: 25%;
+    height: 25%;
+}
+
+.box {
+    display: block;
+    overflow: auto;
+    text-align: left;
+    margin: auto 25%;
+    max-width: 50%;
+    border: 1px solid black;
+    padding: 20px;
+}
+
+.descBox {
+    display: block;
+    margin: auto 30px;
+    border-left: 1px solid black;
+    text-align: left;
+    padding: 10px;
+}
+
 .label {
     color: white;
     padding: 8px;

@@ -23,18 +23,67 @@ function onDrop(id) {
             row.cells[0].innerHTML = boardGame.name;
             row.style.backgroundColor = "lightblue";
 
-            infoBox.innerHTML = this.responseText;
             document.documentElement.scrollTop = 0;
 
-            /** 
-             * name
-             * yearpublished 
-             * minplayers | maxplayers
-             * minplaytime | maxplaytime
-             * age
-             * description
-             * image
-             * boardgamepublisher
+            var parser = new DOMParser();
+            var xmlDoc = parser.parseFromString(this.responseText, "text/xml");
+            var gameInfo = xmlDoc.getElementsByTagName("boardgame");
+
+            if(gameInfo) {
+                var name = boardGame.name;
+                var year = boardGame.year;
+
+                //----
+
+                var minplayers = gameInfo[0].getElementsByTagName("minplayers")[0];
+                if(minplayers) minplayers = minplayers.childNodes[0].nodeValue;
+                var maxplayers = gameInfo[0].getElementsByTagName("maxplayers")[0];
+                if(maxplayers) maxplayers = maxplayers.childNodes[0].nodeValue;
+
+                //----
+
+                var minplaytime = gameInfo[0].getElementsByTagName("minplaytime")[0];
+                if(minplaytime) minplaytime = minplaytime.childNodes[0].nodeValue;
+                var maxplaytime = gameInfo[0].getElementsByTagName("maxplaytime")[0];
+                if(maxplaytime) maxplaytime = maxplaytime.childNodes[0].nodeValue;
+
+                //----
+
+                var age = gameInfo[0].getElementsByTagName("age")[0];
+                if(age) age = age.childNodes[0].nodeValue;
+                var description = gameInfo[0].getElementsByTagName("description")[0];
+                if(description) description = description.childNodes[0].nodeValue;
+                var image = gameInfo[0].getElementsByTagName("image")[0];
+                if(image) image = image.childNodes[0].nodeValue;
+                var boardgamepublishers = gameInfo[0].getElementsByTagName("boardgamepublisher");
+                var readyBGPs = [];
+                if(boardgamepublishers[0]) {
+                    for(let i = 0; i < boardgamepublishers.length; i++) {
+                        if(boardgamepublishers[i]) {
+                            readyBGPs.push("<li>"+ boardgamepublishers[i].childNodes[0].nodeValue + "</li>");
+                        }
+                    }
+                }
+
+                infoBox.innerHTML = `
+                    <strong>Name:</strong> ${name}<img class="boxImg" src="${image}" /><br />
+                    <strong>Published Year:</strong> ${year}<br />
+                    <strong>Minplayers:</strong> ${minplayers}<br />
+                    <strong>Maxplayers:</strong> ${maxplayers}<br />
+                    <strong>Minplaytime:</strong> ${minplaytime}<br />
+                    <strong>Maxplaytime:</strong> ${maxplaytime}<br />
+                    <strong>Age:</strong> ${age}<br /><br />
+                    <strong>Description:</strong> <div class="descBox">${description}</div><br /><br />
+                    <strong>Boardgamepublishers:</strong><br /><ul>${readyBGPs.join("\n")}</ul><br />
+                `;
+            }
+
+            var msg = xmlDoc.getElementsByTagName("message");
+            if(msg[0]) {
+                infoBox.innerHTML = msg[0].childNodes[0].nodeValue;
+            }
+
+            /** What is left
              * boardgamedesigner
              * boardgameartist
              * statistics => ratings
