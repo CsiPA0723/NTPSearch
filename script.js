@@ -1,19 +1,19 @@
 var url = "https://cors-anywhere.herokuapp.com/http://www.boardgamegeek.com/xmlapi/";
-var numOfTries = 0;
-var boardGames = new Map();
+var numOfTries = 0; //Probálkozások száma
+var boardGames = new Map(); //A társasjáték object-umok map-ja
 window.onscroll = function() {scrollFunction()};
-var interval = 0;
-var chskServ = false;
 
-function onDrop(id) {
+//A játék információkat kéri le és irja ki.
+
+function getGameInfo(id) {
     numOfTries = 0;
     var searchingBoardGame = findIn(boardGames, "searching", true, true);
     if(searchingBoardGame) return;
 
-    console.log("onDrop");
+    console.log("getGameInfo");
 
     var boardGame = boardGames.get(id);
-    console.log(boardGame);
+    console.log("BoardGame: " + boardGame);
 
     var infoBox = document.getElementById("selected-game");
     var row = document.getElementById(`${boardGame.id}`);
@@ -37,15 +37,14 @@ function onDrop(id) {
             result.innerHTML = `The server is not responding correctly, please stand by. (${numOfTries})`;
             result.scrollIntoView();
             setTimeout(() => {
-                if(uSelect) xhttp.open("GET", `${url}collection/${encodeURIComponent(uSearch)}?${encodeURIComponent(uSelect)}=${encodeURIComponent(uSelect2)}`, true);
-                else xhttp.open("GET", `${url}collection/${encodeURIComponent(uSearch)}`, true);
+                xhttp.open("GET", `${url}boardgame/${id}?stats=1`, true)
                 xhttp.send();
             }, 5000);
         }
         if(this.readyState == 4 && this.status == 200) {
-            infoBox.innerHTML = "<label class='waitLabel'>Something went wrong...</label>";
+            infoBox.innerHTML = "<label class='waitLabel'>Something went wrong...</label>"; //Ha a gamelist és msg is üres akkor nem talált semmit
             var selectedBoardGame = findIn(boardGames, "selected", true, true);
-            console.log(selectedBoardGame);
+            console.log("SelectedBoardGame: " + selectedBoardGame);
             if(selectedBoardGame) {
                 selectedBoardGame.selected = false;
                 var selectedRow = document.getElementById(`${selectedBoardGame.id}`);
@@ -67,7 +66,7 @@ function onDrop(id) {
                 var name = boardGame.name;
                 var year = boardGame.year;
 
-                //----
+                //Előkészítjük az információkat és le is teszteljuk, hogy meg lettek-e adva
 
                 var minplayers = gameInfo[0].getElementsByTagName("minplayers")[0];
                 if(minplayers) minplayers = minplayers.childNodes[0].nodeValue;
@@ -134,10 +133,8 @@ function onDrop(id) {
                 infoBox.innerHTML =
                     `<strong>Average Rating:</strong><div id="rateBar"><div id="rating"></div></div><br/>
                     <img class="boxImg" src="${image}" alt="${!image ? "Not available." : "This game has a picture but something went wrong."}" />
-                    <div class="ratingBox"><p>
-                    <strong>Difficulty:</strong> ${roundNumber(averageweight, 1)} / 5<br/>
-                    <strong>User owns:</strong> ${owned}<br/>
-                    </p></div>
+                    <div class="ratingBox"><p><strong>Difficulty:</strong> ${roundNumber(averageweight, 1)} / 5<br/>
+                    <strong>User owns:</strong> ${owned}</p></div>
                     <h2>Name: ${name}</h2>
                     <strong>Published Year:</strong> ${year}<br/><br/>
                     <strong>Minimum Players:</strong> ${minplayers}<br/>
@@ -146,20 +143,23 @@ function onDrop(id) {
                     <strong>Maximum Playtime:</strong> ${maxplaytime}<br/><br/>
                     <strong>Recommended Minimum Age:</strong> ${age}<br/><br/>
                     <strong>Description:</strong> <div class="descBox">${description}</div><br/><br/>
-                    <strong>Board Game Publisher(s):</strong><br/><ul>${readyBGPs[0] ? readyBGPs.join("\n") : "<li>(Uncredited)</li>"}</ul><br/>
-                    <strong>Board Game Designer(s):</strong><br/><ul>${readyBGDs[0] ? readyBGDs.join("\n") : "<li>(Uncredited)</li>"}</ul><br/>
-                    <strong>Board Game Artist(s):</strong><br/><ul>${readyBGAs[0] ? readyBGAs.join("\n") : "<li>(Uncredited)</li>"}</ul><br/>`;
+                    <strong>Board Game Publisher(s):</strong><br/><ul>${readyBGPs[0] ? readyBGPs.join("\n") : "<li>(Uncredited)</li>"}</ul>
+                    <strong>Board Game Designer(s):</strong><br/><ul>${readyBGDs[0] ? readyBGDs.join("\n") : "<li>(Uncredited)</li>"}</ul>
+                    <strong>Board Game Artist(s):</strong><br/><ul>${readyBGAs[0] ? readyBGAs.join("\n") : "<li>(Uncredited)</li>"}</ul>`;
+
+
+                //A rating-hez megcsináljuk a százalkot
 
                 var ratingNum = roundNumber(average * 10, 1);
                 var rating = document.getElementById("rating");
                 rating.style.width = ratingNum + "%";
                 rating.innerHTML = ratingNum + "%";
             } else if(msg[0]) {
+                //Ha esetleg mást adna vissza és az egy üzenet lenne a szervertől akkor kiírjuk azt
                 infoBox.innerHTML = msg[0].childNodes[0].nodeValue;
             }
             console.log("Abort");
             numOfTries = 0;
-            clearInterval(interval);
             this.abort();
         }
     }
@@ -167,11 +167,15 @@ function onDrop(id) {
     xhttp.send();
 }
 
+//Az utolsó kiválaszott lista elemhez dob vissza.
+
 function lastSelected() {
     var selectedBoardGame = findIn(boardGames, "selected", true, true);
     if(!selectedBoardGame) return;
     document.getElementById(`${selectedBoardGame.id}`).scrollIntoView();
 }
+
+//A társasjátékokat kéri le és iratja ki azokat. 
 
 function gameSearch() {
     console.log("gameSearch");
@@ -202,13 +206,12 @@ function gameSearch() {
             result.innerHTML = `The server is not responding correctly, please stand by. (${numOfTries})`;
             result.scrollIntoView();
             setTimeout(() => {
-                if(uSelect) xhttp.open("GET", `${url}collection/${encodeURIComponent(uSearch)}?${encodeURIComponent(uSelect)}=${encodeURIComponent(uSelect2)}`, true);
-                else xhttp.open("GET", `${url}collection/${encodeURIComponent(uSearch)}`, true);
+                xhttp.open("GET", `${url}search?search=${encodeURIComponent(gSearch)}`, true)
                 xhttp.send();
             }, 5000);
         }
         if(this.readyState == 4 && this.status == 200) {
-            result.innerHTML = "There is no such board game...";
+            result.innerHTML = "There is no such board game..."; //Ha a gamelist és msg is üres akkor nem talált semmit
             var parser = new DOMParser();
             var xmlDoc = parser.parseFromString(this.responseText, "text/xml");
             var gamelist = xmlDoc.getElementsByTagName("boardgame");
@@ -216,18 +219,20 @@ function gameSearch() {
             if(gamelist[0]) {
                 createTable(gamelist, result);
             } else if(msg[0]) {
+                //Ha esetleg mást adna vissza és az egy üzenet lenne a szervertől akkor kiírjuk azt
                 result.innerHTML = msg[0].childNodes[0].nodeValue;
             }
             result.scrollIntoView();
             console.log("Abort");
             numOfTries = 0;
-            clearInterval(interval);
             this.abort();
         }
     }
     xhttp.open("GET", `${url}search?search=${encodeURIComponent(gSearch)}`, true)
     xhttp.send();
 }
+
+//A felhasználok játékait kéri le és irja ki azokat.
 
 function userSearch() {
     console.log("userSearch");
@@ -266,7 +271,7 @@ function userSearch() {
             }, 5000);
         }
         if(this.readyState == 4 && this.status == 200) {
-            result.innerHTML = "Could not find anything...";
+            result.innerHTML = "Could not find anything..."; //Ha a gamelist és msg is üres akkor nem talált semmit
             var parser = new DOMParser();
             var xmlDoc = parser.parseFromString(this.responseText, "text/xml");
             var gamelist = xmlDoc.getElementsByTagName("item");
@@ -274,12 +279,12 @@ function userSearch() {
             if(gamelist[0]) {
                 createTable(gamelist, result);
             } else if(msg[0]) {
+                //Ha esetleg mást adna vissza és az egy üzenet lenne a szervertől akkor kiírjuk azt
                 result.innerHTML = msg[0].childNodes[0].nodeValue;
             }
             result.scrollIntoView();
             console.log("Abort");
             numOfTries = 0;
-            clearInterval(interval);
             this.abort();
         }
     }
@@ -288,6 +293,8 @@ function userSearch() {
     else xhttp.open("GET", `${url}collection/${encodeURIComponent(uSearch)}`, true);
     xhttp.send();
 }
+
+//A társasjáték objektum séma
 
 function createBoardGameObject(id, name, year) {
     var obj = {
@@ -299,6 +306,9 @@ function createBoardGameObject(id, name, year) {
     }
     return obj;
 }
+
+//Keresési algoritmus egy map-ban érték alapján
+
 function findIn(map, find, value, first) {
     if(first) {
         var key;
@@ -321,6 +331,8 @@ function findIn(map, find, value, first) {
     return false;
 }
 
+//Szám kerekités
+
 function roundNumber(num, scale) {
     if(!("" + num).includes("e")) {
         return +(Math.round(num + "e+" + scale)  + "e-" + scale);
@@ -333,6 +345,8 @@ function roundNumber(num, scale) {
         return +(Math.round(+arr[0] + "e" + sig + (+arr[1] + scale)) + "e-" + scale);
     }
 }
+
+//Tábla kreálás a listához
 
 function createTable(gamelist, result) {
     var tbl = document.createElement('table');
@@ -356,7 +370,7 @@ function createTable(gamelist, result) {
 
         tr = document.createElement('tr');
         tr.id = id;
-        tr.onclick = function() {onDrop(this.id)};
+        tr.onclick = function() {getGameInfo(this.id)};
         for(let j = 0; j < 2; j++) {
             var td = document.createElement('td');
             td.innerHTML = j == 0 ? name : year;
@@ -371,6 +385,8 @@ function createTable(gamelist, result) {
     result.appendChild(tbl);
 }
 
+//Görgető funkció a toTop gombhoz
+
 function scrollFunction() {
     if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
         document.getElementById("myBtn").style.display = "block";
@@ -379,8 +395,7 @@ function scrollFunction() {
     }
 }
 
-// When the user clicks on the button, scroll to the top of the document
+//Mikor a felhasználó rá káttaint a gombra, fölgörget az oldal tetejére.
 function topFunction() {
-    document.body.scrollTop = 0; // For Safari
-    document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+    document.documentElement.scrollTop = 0;
 }
