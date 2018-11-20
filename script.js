@@ -1,11 +1,16 @@
 var url = "https://cors-anywhere.herokuapp.com/http://www.boardgamegeek.com/xmlapi/";
-var numOfTries = 1;
+var numOfTries = 0;
 var boardGames = new Map();
 window.onscroll = function() {scrollFunction()};
+var interval = 0;
+var chskServ = false;
 
 function onDrop(id) {
+    numOfTries = 0;
     var searchingBoardGame = findIn(boardGames, "searching", true, true);
     if(searchingBoardGame) return;
+
+    console.log("onDrop");
 
     var boardGame = boardGames.get(id);
     console.log(boardGame);
@@ -17,7 +22,28 @@ function onDrop(id) {
     var xhttp = new XMLHttpRequest();
 
     xhttp.onreadystatechange = function() {
+        console.log("ReadyState: " + this.readyState);
+        console.log("Status: " + this.status);
+        if(this.readyState = 4 && this.status == 202) {
+            numOfTries++;
+            if(numOfTries > 4) {
+                result.innerHTML = "The server is not ready. Please try again later.";
+                numOfTries = 0;
+                console.log("Abort");
+                this.abort();
+            }
+            console.log("Abort");
+            this.abort();
+            result.innerHTML = `The server is not responding correctly, please stand by. (${numOfTries})`;
+            result.scrollIntoView();
+            setTimeout(() => {
+                if(uSelect) xhttp.open("GET", `${url}collection/${encodeURIComponent(uSearch)}?${encodeURIComponent(uSelect)}=${encodeURIComponent(uSelect2)}`, true);
+                else xhttp.open("GET", `${url}collection/${encodeURIComponent(uSearch)}`, true);
+                xhttp.send();
+            }, 5000);
+        }
         if(this.readyState == 4 && this.status == 200) {
+            infoBox.innerHTML = "<label class='waitLabel'>Something went wrong...</label>";
             var selectedBoardGame = findIn(boardGames, "selected", true, true);
             console.log(selectedBoardGame);
             if(selectedBoardGame) {
@@ -130,21 +156,11 @@ function onDrop(id) {
                 rating.innerHTML = ratingNum + "%";
             } else if(msg[0]) {
                 infoBox.innerHTML = msg[0].childNodes[0].nodeValue;
-            } else {
-                infoBox.innerHTML = "<label class='waitLabel'>Something went wrong...</label>";
             }
-        }
-
-        if(this.status == 500 || this.status == 504  || this.status == 202) {
-            result.scrollIntoView();
-            var interval = setInterval(() => {
-                xhttp.send();
-                if((this.readyState == 4 && this.status == 200) || numOfTries == 4) {
-                    result.innerHTML = `The server is not responding... (${numOfTries})`;
-                    clearInterval(interval);
-                }
-                numOfTries++;
-            }, 5000);
+            console.log("Abort");
+            numOfTries = 0;
+            clearInterval(interval);
+            this.abort();
         }
     }
     xhttp.open("GET", `${url}boardgame/${id}?stats=1`, true)
@@ -158,7 +174,8 @@ function lastSelected() {
 }
 
 function gameSearch() {
-    numOfTries = 1;
+    console.log("gameSearch");
+    numOfTries = 0;
     boardGames = new Map();
     var gSearch = document.getElementById("game-search").value;
     if(!gSearch) {
@@ -170,7 +187,28 @@ function gameSearch() {
     var xhttp = new XMLHttpRequest();
 
     xhttp.onreadystatechange = function() {
+        console.log("ReadyState: " + this.readyState);
+        console.log("Status: " + this.status);
+        if(this.readyState = 4 && this.status == 202) {
+            numOfTries++;
+            if(numOfTries > 4) {
+                result.innerHTML = "The server is not ready. Please try again later.";
+                numOfTries = 0;
+                console.log("Abort");
+                this.abort();
+            }
+            console.log("Abort");
+            this.abort();
+            result.innerHTML = `The server is not responding correctly, please stand by. (${numOfTries})`;
+            result.scrollIntoView();
+            setTimeout(() => {
+                if(uSelect) xhttp.open("GET", `${url}collection/${encodeURIComponent(uSearch)}?${encodeURIComponent(uSelect)}=${encodeURIComponent(uSelect2)}`, true);
+                else xhttp.open("GET", `${url}collection/${encodeURIComponent(uSearch)}`, true);
+                xhttp.send();
+            }, 5000);
+        }
         if(this.readyState == 4 && this.status == 200) {
+            result.innerHTML = "There is no such board game...";
             var parser = new DOMParser();
             var xmlDoc = parser.parseFromString(this.responseText, "text/xml");
             var gamelist = xmlDoc.getElementsByTagName("boardgame");
@@ -179,21 +217,12 @@ function gameSearch() {
                 createTable(gamelist, result);
             } else if(msg[0]) {
                 result.innerHTML = msg[0].childNodes[0].nodeValue;
-            } else {
-                result.innerHTML = "There is no such game...";
             }
             result.scrollIntoView();
-        }
-        if(this.status == 500 || this.status == 504  || this.status == 202) {
-            result.scrollIntoView();
-            var interval = setInterval(() => {
-                xhttp.send();
-                if((this.readyState == 4 && this.status == 200) || numOfTries == 4) {
-                    result.innerHTML = `The server is not responding... (${numOfTries})`;
-                    clearInterval(interval);
-                }
-                numOfTries++;
-            }, 5000);
+            console.log("Abort");
+            numOfTries = 0;
+            clearInterval(interval);
+            this.abort();
         }
     }
     xhttp.open("GET", `${url}search?search=${encodeURIComponent(gSearch)}`, true)
@@ -201,7 +230,8 @@ function gameSearch() {
 }
 
 function userSearch() {
-    numOfTries = 1;
+    console.log("userSearch");
+    numOfTries = 0;
     boardGames = new Map();
     var uSearch = document.getElementById("user-search").value;
     var uSelect = document.getElementById("user-select").value;
@@ -215,7 +245,28 @@ function userSearch() {
     var xhttp = new XMLHttpRequest();
 
     xhttp.onreadystatechange = function() {
+        console.log("ReadyState: " + this.readyState);
+        console.log("Status: " + this.status);
+        if(this.readyState = 4 && this.status == 202) {
+            numOfTries++;
+            if(numOfTries > 4) {
+                result.innerHTML = "The server is not ready. Please try again later.";
+                numOfTries = 0;
+                console.log("Abort");
+                this.abort();
+            }
+            console.log("Abort");
+            this.abort();
+            result.innerHTML = `The server is not responding correctly, please stand by. (${numOfTries})`;
+            result.scrollIntoView();
+            setTimeout(() => {
+                if(uSelect) xhttp.open("GET", `${url}collection/${encodeURIComponent(uSearch)}?${encodeURIComponent(uSelect)}=${encodeURIComponent(uSelect2)}`, true);
+                else xhttp.open("GET", `${url}collection/${encodeURIComponent(uSearch)}`, true);
+                xhttp.send();
+            }, 5000);
+        }
         if(this.readyState == 4 && this.status == 200) {
+            result.innerHTML = "Could not find anything...";
             var parser = new DOMParser();
             var xmlDoc = parser.parseFromString(this.responseText, "text/xml");
             var gamelist = xmlDoc.getElementsByTagName("item");
@@ -224,21 +275,12 @@ function userSearch() {
                 createTable(gamelist, result);
             } else if(msg[0]) {
                 result.innerHTML = msg[0].childNodes[0].nodeValue;
-            } else {
-                result.innerHTML = "This user is do not have any board game.";
             }
             result.scrollIntoView();
-        }
-        if(this.status == 500 || this.status == 504 || this.status == 202) {
-            result.scrollIntoView();
-            var interval = setInterval(() => {
-                xhttp.send();
-                if((this.readyState == 4 && this.status == 200) || numOfTries == 4) {
-                    result.innerHTML = `The server is not responding... (${numOfTries})`;
-                    clearInterval(interval);
-                }
-                numOfTries++;
-            }, 5000);
+            console.log("Abort");
+            numOfTries = 0;
+            clearInterval(interval);
+            this.abort();
         }
     }
 
@@ -257,7 +299,6 @@ function createBoardGameObject(id, name, year) {
     }
     return obj;
 }
-
 function findIn(map, find, value, first) {
     if(first) {
         var key;
