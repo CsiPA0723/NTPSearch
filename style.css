@@ -82,28 +82,17 @@ img.boxImg {
     padding: 10px;
 }
 
-.stars-outer {
-    display: inline-block;
-    position: relative;
-    font-family: FontAwesome;
+#rateBar {
+    width: 100%;
+    background-color: #ddd;
 }
 
-.stars-outer::before {
-    content: "\f006 \f006 \f006 \f006 \f006";
-}
-
-.stars-inner {
-    position: absolute;
-    top: 0;
-    left: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    width: 0;
-}
-
-.stars-inner::before {
-    content: "\f005 \f005 \f005 \f005 \f005";
-    color: #f8ce0b;
+#rating {
+    width: 10%;
+    height: 30px;
+    background-color: rgb(248, 212, 6);
+    text-align: center;
+    line-height: 30px;
 }
 
 .label {
@@ -122,3 +111,23 @@ img.boxImg {
 .warning {background-color: #ff9800;} /* Orange */
 .danger {background-color: #f44336;} /* Red */ 
 .other {background-color: #e7e7e7; color: black;} /* Gray */
+
+#myBtn {
+    display: none; /* Hidden by default */
+    position: fixed; /* Fixed/sticky position */
+    bottom: 20px; /* Place the button at the bottom of the page */
+    right: 30px; /* Place the button 30px from the right */
+    z-index: 99; /* Make sure it does not overlap */
+    border: none; /* Remove borders */
+    outline: none; /* Remove outline */
+    background-color: black; /* Set a background color */
+    color: white; /* Text color */
+    cursor: pointer; /* Add a mouse pointer on hover */
+    padding: 15px; /* Some padding */
+    border-radius: 10px; /* Rounded corners */
+    font-size: 18px; /* Increase font size */
+}
+
+#myBtn:hover {
+    background-color: #555; /* Add a dark-grey background on hover */
+}

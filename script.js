@@ -1,6 +1,7 @@
 var url = "https://cors-anywhere.herokuapp.com/http://www.boardgamegeek.com/xmlapi/";
 var numOfTries = 1;
 var boardGames = new Map();
+window.onscroll = function() {scrollFunction()};
 
 function onDrop(id) {
     var searchingBoardGame = findIn(boardGames, "searching", true, true);
@@ -104,10 +105,11 @@ function onDrop(id) {
                     owned = ratings[0].getElementsByTagName("owned")[0].childNodes[0].nodeValue;
                 }
 
-                infoBox.innerHTML = `<img class="boxImg" src="${image}" alt="${!image ? "Not available." : "This game has a picture but something went wrong."}" />
+                infoBox.innerHTML =
+                    `<strong>Average Rating:</strong><div id="rateBar"><div id="rating"></div></div><br/>
+                    <img class="boxImg" src="${image}" alt="${!image ? "Not available." : "This game has a picture but something went wrong."}" />
                     <div class="ratingBox"><p>
-                    <strong>Rating:</strong> ${average}<br/>
-                    <strong>Difficulty:</strong> ${averageweight}<br/>
+                    <strong>Difficulty:</strong> ${roundNumber(averageweight, 1)} / 5<br/>
                     <strong>User owns:</strong> ${owned}<br/>
                     </p></div>
                     <h2>Name: ${name}</h2>
@@ -120,8 +122,12 @@ function onDrop(id) {
                     <strong>Description:</strong> <div class="descBox">${description}</div><br/><br/>
                     <strong>Board Game Publisher(s):</strong><br/><ul>${readyBGPs[0] ? readyBGPs.join("\n") : "<li>(Uncredited)</li>"}</ul><br/>
                     <strong>Board Game Designer(s):</strong><br/><ul>${readyBGDs[0] ? readyBGDs.join("\n") : "<li>(Uncredited)</li>"}</ul><br/>
-                    <strong>Board Game Artist(s):</strong><br/><ul>${readyBGAs[0] ? readyBGAs.join("\n") : "<li>(Uncredited)</li>"}</ul><br/>
-                `;
+                    <strong>Board Game Artist(s):</strong><br/><ul>${readyBGAs[0] ? readyBGAs.join("\n") : "<li>(Uncredited)</li>"}</ul><br/>`;
+
+                var ratingNum = roundNumber(average * 10, 1);
+                var rating = document.getElementById("rating");
+                rating.style.width = ratingNum + "%";
+                rating.innerHTML = ratingNum + "%";
             } else if(msg[0]) {
                 infoBox.innerHTML = msg[0].childNodes[0].nodeValue;
             } else {
@@ -130,6 +136,7 @@ function onDrop(id) {
         }
 
         if(this.status == 500 || this.status == 504  || this.status == 202) {
+            result.scrollIntoView();
             var interval = setInterval(() => {
                 xhttp.send();
                 if((this.readyState == 4 && this.status == 200) || numOfTries == 4) {
@@ -175,8 +182,10 @@ function gameSearch() {
             } else {
                 result.innerHTML = "There is no such game...";
             }
+            result.scrollIntoView();
         }
         if(this.status == 500 || this.status == 504  || this.status == 202) {
+            result.scrollIntoView();
             var interval = setInterval(() => {
                 xhttp.send();
                 if((this.readyState == 4 && this.status == 200) || numOfTries == 4) {
@@ -218,8 +227,10 @@ function userSearch() {
             } else {
                 result.innerHTML = "This user is do not have any board game.";
             }
+            result.scrollIntoView();
         }
         if(this.status == 500 || this.status == 504 || this.status == 202) {
+            result.scrollIntoView();
             var interval = setInterval(() => {
                 xhttp.send();
                 if((this.readyState == 4 && this.status == 200) || numOfTries == 4) {
@@ -269,6 +280,19 @@ function findIn(map, find, value, first) {
     return false;
 }
 
+function roundNumber(num, scale) {
+    if(!("" + num).includes("e")) {
+        return +(Math.round(num + "e+" + scale)  + "e-" + scale);
+    } else {
+        var arr = ("" + num).split("e");
+        var sig = ""
+        if(+arr[1] + scale > 0) {
+            sig = "+";
+        }
+        return +(Math.round(+arr[0] + "e" + sig + (+arr[1] + scale)) + "e-" + scale);
+    }
+}
+
 function createTable(gamelist, result) {
     var tbl = document.createElement('table');
     tbl.id = "table";
@@ -304,4 +328,18 @@ function createTable(gamelist, result) {
     tbl.appendChild(tbdy);
     result.innerHTML = "";
     result.appendChild(tbl);
+}
+
+function scrollFunction() {
+    if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+        document.getElementById("myBtn").style.display = "block";
+    } else {
+        document.getElementById("myBtn").style.display = "none";
+    }
+}
+
+// When the user clicks on the button, scroll to the top of the document
+function topFunction() {
+    document.body.scrollTop = 0; // For Safari
+    document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
 }
