@@ -7,6 +7,7 @@ window.onscroll = function() {scrollFunction()};
 
 function getGameInfo(id) {
     numOfTries = 0;
+    //Megkeressük azt a játékot amit éppen keresünk, ha van akkor ignoráljuk a kérést, mert akkor az előző elveszne
     var searchingBoardGame = findIn(boardGames, "searching", true, true);
     if(searchingBoardGame) return;
 
@@ -29,15 +30,15 @@ function getGameInfo(id) {
             //amíg vagy jó nem lesz vagy 4-szer nem csinálja ezt meg
             numOfTries++;
             if(numOfTries > 4) {
-                result.innerHTML = "The server is not ready. Please try again later.";
+                infoBox.innerHTML = "<label class='waitLabel'>The server is not ready. Please try again later.</label>";
                 numOfTries = 0;
                 console.log("Abort");
                 this.abort();
             }
             console.log("Abort");
             this.abort();
-            result.innerHTML = `The server is not responding correctly, please stand by. (${numOfTries})`;
-            result.scrollIntoView();
+            infoBox.innerHTML = `<label class='waitLabel'>The server is not responding correctly, please stand by. (${numOfTries})</label>`;
+            infoBox.scrollIntoView();
             setTimeout(() => {
                 xhttp.open("GET", `${url}boardgame/${id}?stats=1`, true)
                 xhttp.send();
@@ -46,6 +47,8 @@ function getGameInfo(id) {
         if(this.readyState == 4 && this.status == 200) {
             //Ha normális választ kap
             infoBox.innerHTML = "<label class='waitLabel'>Something went wrong...</label>"; //Ha a gamelist és msg is üres akkor nem talált semmit
+            //Megkeressük a már kiválaszott játékot és vissza rakjuk normálba
+            //A jenlegit meg kiválasztjuk
             var selectedBoardGame = findIn(boardGames, "selected", true, true);
             console.log("SelectedBoardGame: " + selectedBoardGame);
             if(selectedBoardGame) {
@@ -58,18 +61,16 @@ function getGameInfo(id) {
             row.cells[0].innerHTML = boardGame.name;
             row.style.backgroundColor = "lightblue";
 
-            document.documentElement.scrollTop = 0;
+            document.documentElement.scrollTop = 0; //Főlgörgetünk a lap tetejére
 
             var parser = new DOMParser();
             var xmlDoc = parser.parseFromString(this.responseText, "text/xml");
             var gameInfo = xmlDoc.getElementsByTagName("boardgame");
             var msg = xmlDoc.getElementsByTagName("message");
 
-            if(gameInfo) {
-                var name = boardGame.name;
-                var year = boardGame.year;
-
-                //Előkészítjük az információkat és le is teszteljuk, hogy meg lettek-e adva
+            if(gameInfo[0]) {
+                //Előkészítjük az információkat és le is teszteljük, hogy meg lettek-e adva a lekérdezés által
+                //Így elkerülve az "undefined" error-t
 
                 var minplayers = gameInfo[0].getElementsByTagName("minplayers")[0];
                 if(minplayers) minplayers = minplayers.childNodes[0].nodeValue;
@@ -87,6 +88,8 @@ function getGameInfo(id) {
                 if(description) description = description.childNodes[0].nodeValue;
                 var image = gameInfo[0].getElementsByTagName("image")[0];
                 if(image) image = image.childNodes[0].nodeValue;
+
+                //Előkészítjük a listázásra ezeket az elemeket, mert belőlük több is lehet
 
                 var boardgamepublishers = gameInfo[0].getElementsByTagName("boardgamepublisher");
                 var readyBGPs = [];
@@ -138,8 +141,8 @@ function getGameInfo(id) {
                     <img class="boxImg" src="${image}" alt="${!image ? "Not available." : "This game has a picture but something went wrong."}" />
                     <div class="ratingBox"><p><strong>Difficulty:</strong> ${roundNumber(averageweight, 1)} / 5<br/>
                     <strong>User owns:</strong> ${owned}</p></div>
-                    <h2>Name: ${name}</h2>
-                    <strong>Published Year:</strong> ${year}<br/><br/>
+                    <h2>Name: ${boardGame.name}</h2>
+                    <strong>Published Year:</strong> ${boardGame.year}<br/><br/>
                     <strong>Minimum Players:</strong> ${minplayers}<br/>
                     <strong>Maximum Players:</strong> ${maxplayers}<br/><br/>
                     <strong>Minimum Playtime:</strong> ${minplaytime}<br/>
@@ -304,7 +307,7 @@ function userSearch() {
     xhttp.send();
 }
 
-//A társasjáték objektum séma
+//A társasjáték objektum shéma
 
 function createBoardGameObject(id, name, year) {
     var obj = {
@@ -317,7 +320,7 @@ function createBoardGameObject(id, name, year) {
     return obj;
 }
 
-//Keresési algoritmus egy map-ban érték alapján
+//Keresési algoritmus egy map-ban, érték alapján
 
 function findIn(map, find, value, first) {
     if(first) {
