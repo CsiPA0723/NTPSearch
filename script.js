@@ -1,4 +1,4 @@
-var url = "https://cors-anywhere.herokuapp.com/http://www.boardgamegeek.com/xmlapi/";
+const url = "https://cors-anywhere.herokuapp.com/http://www.boardgamegeek.com/xmlapi/"; //A fő url-ünk
 var numOfTries = 0; //Probálkozások száma
 var boardGames = new Map(); //A társasjáték object-umok map-ja
 window.onscroll = function() {scrollFunction()};
@@ -46,7 +46,7 @@ function getGameInfo(id) {
         }
         if(this.readyState == 4 && this.status == 200) {
             //Ha normális választ kap
-            infoBox.innerHTML = "<label class='waitLabel'>Something went wrong...</label>"; //Ha a gamelist és msg is üres akkor nem talált semmit
+            infoBox.innerHTML = "<label class='waitLabel'>Something went wrong...</label>"; //Ha a gameInfo és msg is üres akkor nem talált semmit
             //Megkeressük a már kiválaszott játékot és vissza rakjuk normálba
             //A jenlegit meg kiválasztjuk
             var selectedBoardGame = findIn(boardGames, "selected", true, true);
