@@ -4,9 +4,8 @@
 
 body {
     text-align: center;
-    background-color: snow;
-    background-repeat: no-repeat;
-    background-size: 150%; 
+    /*background-color: snow;*/
+    background-image: url("backg.png");
 }
 
 p {
@@ -46,12 +45,9 @@ button{
 }
 
 h1 {
-    color: gray;
     text-shadow:
-    -1px -1px 0 #000,
-    1px -1px 0 #000,
-    -1px 1px 0 #000,
-    1px 1px 0 #000; 
+    -1px -1px 0 grey,
+    1px -1px 0 grey;
 }
 
 img.boxImg {
