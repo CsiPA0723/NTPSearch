@@ -25,6 +25,8 @@ function getGameInfo(id) {
         console.log("ReadyState: " + this.readyState);
         console.log("Status: " + this.status);
         if(this.readyState = 4 && this.status == 202) {
+            //Ha 202 kódot kap akkor 5 mp után elküldi újra a kérelmet egsézen addig
+            //amíg vagy jó nem lesz vagy 4-szer nem csinálja ezt meg
             numOfTries++;
             if(numOfTries > 4) {
                 result.innerHTML = "The server is not ready. Please try again later.";
@@ -42,6 +44,7 @@ function getGameInfo(id) {
             }, 5000);
         }
         if(this.readyState == 4 && this.status == 200) {
+            //Ha normális választ kap
             infoBox.innerHTML = "<label class='waitLabel'>Something went wrong...</label>"; //Ha a gamelist és msg is üres akkor nem talált semmit
             var selectedBoardGame = findIn(boardGames, "selected", true, true);
             console.log("SelectedBoardGame: " + selectedBoardGame);
@@ -148,7 +151,7 @@ function getGameInfo(id) {
                     <strong>Board Game Artist(s):</strong><br/><ul>${readyBGAs[0] ? readyBGAs.join("\n") : "<li>(Uncredited)</li>"}</ul>`;
 
 
-                //A rating-hez megcsináljuk a százalkot
+                //A rating-hez megcsináljuk a százalékot
 
                 var ratingNum = roundNumber(average * 10, 1);
                 var rating = document.getElementById("rating");
@@ -180,8 +183,10 @@ function lastSelected() {
 function gameSearch() {
     console.log("gameSearch");
     numOfTries = 0;
-    boardGames = new Map();
+    boardGames = new Map(); //Minden egyess kérelemnél úrja kreáljuk, így elkerűlve a keveredést és a fölösleges adatot
     var gSearch = document.getElementById("game-search").value;
+    //Ha nem ír be semmit a felhsználó fölöslegesen nem küldünk el kérelmet
+    //és kérjuk, hogy töltse ki
     if(!gSearch) {
         document.getElementById("result").innerHTML = "Game search text is missing, please fill it in.";
         return;
@@ -194,6 +199,8 @@ function gameSearch() {
         console.log("ReadyState: " + this.readyState);
         console.log("Status: " + this.status);
         if(this.readyState = 4 && this.status == 202) {
+            //Ha 202 kódot kap akkor 5 mp után elküldi újra a kérelmet egsézen addig
+            //amíg vagy jó nem lesz vagy 4-szer nem csinálja ezt meg
             numOfTries++;
             if(numOfTries > 4) {
                 result.innerHTML = "The server is not ready. Please try again later.";
@@ -211,6 +218,7 @@ function gameSearch() {
             }, 5000);
         }
         if(this.readyState == 4 && this.status == 200) {
+            //Ha normális választ kap
             result.innerHTML = "There is no such board game..."; //Ha a gamelist és msg is üres akkor nem talált semmit
             var parser = new DOMParser();
             var xmlDoc = parser.parseFromString(this.responseText, "text/xml");
@@ -237,10 +245,12 @@ function gameSearch() {
 function userSearch() {
     console.log("userSearch");
     numOfTries = 0;
-    boardGames = new Map();
+    boardGames = new Map(); //Minden egyess kérelemnél úrja kreáljuk, így elkerűlve a keveredést és a fölösleges adatot
     var uSearch = document.getElementById("user-search").value;
     var uSelect = document.getElementById("user-select").value;
     var uSelect2 = document.getElementById("user-select2").value;
+    //Ha nem ír be semmit a felhsználó fölöslegesen nem küldünk el kérelmet
+    //és kérjuk, hogy töltse ki
     if(!uSearch) {
         document.getElementById("result").innerHTML = "User search text is missing, please fill it in.";
         return;
@@ -313,6 +323,7 @@ function findIn(map, find, value, first) {
     if(first) {
         var key;
         map.forEach((v, k) => {
+            //Egészen addig megyünk amíg meg nem találjuk az első értéket ami megfelel a feltételnek
             if(v[`${find}`] == value) {
                 key = k;
                 return;
@@ -322,13 +333,14 @@ function findIn(map, find, value, first) {
     } else {
         var keys = [];
         map.forEach((v, k) => {
+            //Minden értéket vissza adunk ami megfelel a feltételnek
             if(v[`${find}`] == value) {
                 keys.push(k);
             }
         })
         if(keys.length > 0 || keys) return keys;
     }
-    return false;
+    return false; //Ha nem találtunk semmit akkor vissza küldünk egy hamisat, így lehet használni feltételeknél is
 }
 
 //Szám kerekités
