@@ -104,7 +104,7 @@ function onDrop(id) {
                     owned = ratings[0].getElementsByTagName("owned")[0].childNodes[0].nodeValue;
                 }
 
-                infoBox.innerHTML = `<img class="boxImg" src="${image}" />
+                infoBox.innerHTML = `<img class="boxImg" src="${image}" alt="${!image ? "Not available." : "This game has a picture but something went wrong."}" />
                     <div class="ratingBox"><p>
                     <strong>Rating:</strong> ${average}<br/>
                     <strong>Difficulty:</strong> ${averageweight}<br/>
@@ -118,9 +118,9 @@ function onDrop(id) {
                     <strong>Maximum Playtime:</strong> ${maxplaytime}<br/><br/>
                     <strong>Recommended Minimum Age:</strong> ${age}<br/><br/>
                     <strong>Description:</strong> <div class="descBox">${description}</div><br/><br/>
-                    <strong>Board Game Publisher(s):</strong><br/><ul>${readyBGPs[0] ? readyBGPs.join("\n"): "<li>(Uncredited)</li>"}</ul><br/>
-                    <strong>Board Game Designer(s):</strong><br/><ul>${readyBGDs[0] ? readyBGDs.join("\n"): "<li>(Uncredited)</li>"}</ul><br/>
-                    <strong>Board Game Artist(s):</strong><br/><ul>${readyBGAs[0] ? readyBGAs.join("\n"): "<li>(Uncredited)</li>"}</ul><br/>
+                    <strong>Board Game Publisher(s):</strong><br/><ul>${readyBGPs[0] ? readyBGPs.join("\n") : "<li>(Uncredited)</li>"}</ul><br/>
+                    <strong>Board Game Designer(s):</strong><br/><ul>${readyBGDs[0] ? readyBGDs.join("\n") : "<li>(Uncredited)</li>"}</ul><br/>
+                    <strong>Board Game Artist(s):</strong><br/><ul>${readyBGAs[0] ? readyBGAs.join("\n") : "<li>(Uncredited)</li>"}</ul><br/>
                 `;
             } else if(msg[0]) {
                 infoBox.innerHTML = msg[0].childNodes[0].nodeValue;

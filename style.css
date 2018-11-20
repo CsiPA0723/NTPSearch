@@ -4,7 +4,6 @@
 
 body {
     text-align: center;
-    /*background-color: snow;*/
     background-image: url("backg.png");
 }
 
@@ -81,6 +80,30 @@ img.boxImg {
     border: 1px dotted black;
     text-align: left;
     padding: 10px;
+}
+
+.stars-outer {
+    display: inline-block;
+    position: relative;
+    font-family: FontAwesome;
+}
+
+.stars-outer::before {
+    content: "\f006 \f006 \f006 \f006 \f006";
+}
+
+.stars-inner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    width: 0;
+}
+
+.stars-inner::before {
+    content: "\f005 \f005 \f005 \f005 \f005";
+    color: #f8ce0b;
 }
 
 .label {
