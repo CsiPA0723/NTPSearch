@@ -14,7 +14,7 @@ function getGameInfo(id) {
     console.log("getGameInfo");
 
     var boardGame = boardGames.get(id);
-    console.log("BoardGame: " + boardGame);
+    console.log(`BoardGame:\n\tId: ${boardGame.id}\n\tYear: ${boardGame.year}\n\tSelected: ${boardGame.selected}\n\tSearching: ${boardGame.searching}`);
 
     var infoBox = document.getElementById("selected-game");
     var row = document.getElementById(`${boardGame.id}`);
@@ -160,6 +160,7 @@ function getGameInfo(id) {
                 var rating = document.getElementById("rating");
                 rating.style.width = ratingNum + "%";
                 rating.innerHTML = ratingNum + "%";
+                rating.style.backgroundColor = getColorForPercentage(ratingNum / 100);
             } else if(msg[0]) {
                 //Ha esetleg mást adna vissza és az egy üzenet lenne a szervertől akkor kiírjuk azt
                 infoBox.innerHTML = msg[0].childNodes[0].nodeValue;
@@ -414,3 +415,31 @@ function scrollFunction() {
 function topFunction() {
     document.documentElement.scrollTop = 0;
 }
+
+//A ratingBar színének a meghatározását csinálja
+
+var percentColors = [
+    { pct: 0.0, color: { r: 0xff, g: 0x00, b: 0 } },
+    { pct: 0.5, color: { r: 0xff, g: 0xff, b: 0 } },
+    { pct: 1.0, color: { r: 0x00, g: 0xff, b: 0 } }
+];
+
+var getColorForPercentage = function(pct) {
+    for (var i = 1; i < percentColors.length - 1; i++) {
+        if (pct <= percentColors[i].pct) {
+            break;
+        }
+    }
+    var lower = percentColors[i - 1];
+    var upper = percentColors[i];
+    var range = upper.pct - lower.pct;
+    var rangePct = (pct - lower.pct) / range;
+    var pctLower = 1 - rangePct;
+    var pctUpper = rangePct;
+    var color = {
+        r: Math.floor(lower.color.r * pctLower + upper.color.r * pctUpper),
+        g: Math.floor(lower.color.g * pctLower + upper.color.g * pctUpper),
+        b: Math.floor(lower.color.b * pctLower + upper.color.b * pctUpper)
+    };
+    return 'rgb(' + [color.r, color.g, color.b].join(',') + ')';
+} 
